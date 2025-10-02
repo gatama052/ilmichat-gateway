@@ -44,17 +44,24 @@ export const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      const resp = await fetch("https://ilmichat.netlify.app", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userMessage: inputValue,
-          mode: mode,
-        }),
-      });
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ilmichat`,
+        {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
+          },
+          body: JSON.stringify({
+            userMessage: inputValue,
+            mode: mode,
+          }),
+        }
+      );
 
       if (!resp.ok) {
-        throw new Error("Failed to get response");
+        const errorData = await resp.json().catch(() => ({ error: "Failed to get response" }));
+        throw new Error(errorData.error || "Failed to get response");
       }
 
       const data = await resp.json();

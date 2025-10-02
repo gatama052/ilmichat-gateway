@@ -1,0 +1,4 @@
+project_id = "ygxyfdkhkyfnebykczip"
+
+[functions.ilmichat]
+verify_jwt = false
