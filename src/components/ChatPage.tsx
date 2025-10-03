@@ -61,11 +61,13 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const createNewConversation = async () => {
+  const createNewConversation = async (firstUserMessage: string) => {
     if (!session?.user) return null;
 
-    const firstMessage = messages.length > 0 ? messages[0].text : "Percakapan Baru";
-    const title = firstMessage.substring(0, 50) + (firstMessage.length > 50 ? "..." : "");
+    // Generate a meaningful title from the first message
+    const title = firstUserMessage.length > 60 
+      ? firstUserMessage.substring(0, 60).trim() + "..." 
+      : firstUserMessage;
 
     const { data, error } = await supabase
       .from("conversations")
@@ -86,13 +88,13 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
     return data.id;
   };
 
-  const saveMessage = async (text: string, isBot: boolean) => {
+  const saveMessage = async (text: string, isBot: boolean, isFirstMessage: boolean = false) => {
     if (!session?.user) return;
 
     let conversationId = currentConversationId;
     
-    if (!conversationId) {
-      conversationId = await createNewConversation();
+    if (!conversationId && isFirstMessage) {
+      conversationId = await createNewConversation(text);
       if (conversationId) {
         setCurrentConversationId(conversationId);
       } else {
@@ -128,8 +130,9 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
     setInputValue("");
     setIsLoading(true);
 
-    // Save user message
-    await saveMessage(userText, false);
+    // Save user message (mark as first if no conversation exists)
+    const isFirstMessage = currentConversationId === null;
+    await saveMessage(userText, false, isFirstMessage);
 
     try {
       const resp = await fetch(
@@ -223,6 +226,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
         isOpen={showHistory}
         onClose={() => setShowHistory(false)}
         onSelectConversation={loadConversation}
+        onNewChat={handleNewChat}
       />
 
       <div className="flex-1 flex flex-col">

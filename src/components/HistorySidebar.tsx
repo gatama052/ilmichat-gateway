@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 type Conversation = {
@@ -18,6 +18,7 @@ interface HistorySidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectConversation: (id: string) => void;
+  onNewChat: () => void;
 }
 
 export const HistorySidebar = ({
@@ -25,6 +26,7 @@ export const HistorySidebar = ({
   isOpen,
   onClose,
   onSelectConversation,
+  onNewChat,
 }: HistorySidebarProps) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [longPressId, setLongPressId] = useState<string | null>(null);
@@ -101,6 +103,20 @@ export const HistorySidebar = ({
           <h2 className="font-semibold text-lg">Riwayat {mode === "chat" ? "Chat" : "Dakwah"}</h2>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
+          </Button>
+        </div>
+
+        <div className="p-4 border-b border-border">
+          <Button 
+            onClick={() => {
+              onNewChat();
+              onClose();
+            }}
+            className="w-full"
+            variant="default"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Obrolan Baru
           </Button>
         </div>
 
