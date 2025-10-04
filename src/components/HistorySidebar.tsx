@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Trash2, Plus } from "lucide-react";
+import { X, Trash2, Plus, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
 type Conversation = {
@@ -19,6 +19,7 @@ interface HistorySidebarProps {
   onClose: () => void;
   onSelectConversation: (id: string) => void;
   onNewChat: () => void;
+  onLogout: () => void;
 }
 
 export const HistorySidebar = ({
@@ -27,6 +28,7 @@ export const HistorySidebar = ({
   onClose,
   onSelectConversation,
   onNewChat,
+  onLogout,
 }: HistorySidebarProps) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [longPressId, setLongPressId] = useState<string | null>(null);
@@ -167,6 +169,17 @@ export const HistorySidebar = ({
             )}
           </div>
         </ScrollArea>
+
+        <div className="p-4 border-t border-border">
+          <Button 
+            onClick={onLogout}
+            className="w-full"
+            variant="ghost"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Keluar
+          </Button>
+        </div>
       </div>
     </>
   );

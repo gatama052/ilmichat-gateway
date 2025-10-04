@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Send, Loader2, Menu, LogOut, Plus } from "lucide-react";
+import { Send, Loader2, Menu } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { HistorySidebar } from "./HistorySidebar";
@@ -227,6 +227,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
         onClose={() => setShowHistory(false)}
         onSelectConversation={loadConversation}
         onNewChat={handleNewChat}
+        onLogout={handleLogout}
       />
 
       <div className="flex-1 flex flex-col">
@@ -246,25 +247,12 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                   IlmiChat - {mode === "chat" ? "Chat" : "Dakwah"}
                 </h1>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleNewChat}
-                  title="Percakapan Baru"
-                >
-                  <Plus className="h-5 w-5" />
-                </Button>
-                <Button
-                  variant={mode === "chat" ? "ghost" : "default"}
-                  onClick={() => navigate(mode === "chat" ? "/dakwah" : "/chat")}
-                >
-                  {mode === "chat" ? "Dakwah" : "Chat"}
-                </Button>
-                <Button variant="ghost" size="icon" onClick={handleLogout}>
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </div>
+              <Button
+                variant={mode === "chat" ? "ghost" : "default"}
+                onClick={() => navigate(mode === "chat" ? "/dakwah" : "/chat")}
+              >
+                {mode === "chat" ? "Dakwah" : "Chat"}
+              </Button>
             </div>
           </div>
         </header>
