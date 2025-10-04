@@ -221,7 +221,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-background via-accent/20 to-background">
+    <div className="flex h-screen bg-gradient-to-br from-background via-accent/20 to-background overflow-hidden">
       <HistorySidebar
         mode={mode}
         isOpen={showHistory}
@@ -231,26 +231,28 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
         onLogout={handleLogout}
       />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="border-b border-border bg-card/80 backdrop-blur-sm">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+        <header className="border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
+          <div className="w-full px-3 sm:px-4 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowHistory(!showHistory)}
+                  className="flex-shrink-0"
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent truncate">
                   IlmiChat
                 </h1>
               </div>
               <Button
                 variant={mode === "chat" ? "ghost" : "default"}
                 onClick={() => navigate(mode === "chat" ? "/dakwah" : "/chat")}
+                className="flex-shrink-0 text-sm sm:text-base"
               >
                 {mode === "chat" ? "Dakwah" : "Chat"}
               </Button>
@@ -259,20 +261,20 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
         </header>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-6">
-          <div className="container mx-auto max-w-4xl space-y-4">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6">
+          <div className="w-full max-w-4xl mx-auto space-y-4">
             {messages.length === 0 && (
-              <div className="flex items-center justify-center h-full min-h-[60vh]">
-                <div className="text-center space-y-6 max-w-md px-4">
+              <div className="flex items-center justify-center h-full min-h-[60vh] px-4">
+                <div className="text-center space-y-4 w-full max-w-md">
                   <img 
                     src={ilmichatLogo} 
                     alt="IlmiChat Logo" 
-                    className="w-32 h-32 mx-auto mb-6"
+                    className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-4"
                   />
-                  <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+                  <h2 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
                     Assalamu'alaikum!
                   </h2>
-                  <p className="text-muted-foreground text-lg">
+                  <p className="text-muted-foreground text-base sm:text-lg px-4">
                     Saya ILMICHAT, siap menjawab pertanyaan Anda berdasarkan Al-Qur'an dan Hadits.
                   </p>
                 </div>
@@ -285,13 +287,13 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                 className={`flex ${message.isBot ? "justify-start" : "justify-end"} animate-in fade-in slide-in-from-bottom-4 duration-500`}
               >
                 <Card
-                  className={`max-w-[80%] p-4 ${
+                  className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 ${
                     message.isBot
                       ? "bg-card border-primary/20 shadow-soft"
                       : "bg-primary text-primary-foreground shadow-soft"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap break-words">{message.text}</p>
+                  <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{message.text}</p>
                   <span className={`text-xs mt-2 block ${message.isBot ? "text-muted-foreground" : "text-primary-foreground/70"}`}>
                     {message.timestamp.toLocaleTimeString([], {
                       hour: "2-digit",
@@ -318,22 +320,22 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-border bg-card/80 backdrop-blur-sm">
-          <div className="container mx-auto px-4 py-4 max-w-4xl">
+        <div className="border-t border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
+          <div className="w-full px-3 sm:px-4 py-3 sm:py-4 max-w-4xl mx-auto">
             <div className="flex gap-2">
               <Textarea
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Ketik pesan Anda..."
-                className="min-h-[60px] resize-none focus-visible:ring-primary"
+                className="min-h-[60px] resize-none focus-visible:ring-primary flex-1"
                 disabled={isLoading}
               />
               <Button
                 onClick={sendMessage}
                 disabled={!inputValue.trim() || isLoading}
                 size="icon"
-                className="h-[60px] w-[60px] rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                className="h-[60px] w-[60px] rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0"
               >
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
