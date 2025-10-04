@@ -31,8 +31,6 @@ export const HistorySidebar = ({
   onLogout,
 }: HistorySidebarProps) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [longPressId, setLongPressId] = useState<string | null>(null);
-  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -72,21 +70,6 @@ export const HistorySidebar = ({
 
     toast.success("Percakapan berhasil dihapus");
     setConversations(conversations.filter((c) => c.id !== id));
-    setLongPressId(null);
-  };
-
-  const handlePressStart = (id: string) => {
-    const timer = setTimeout(() => {
-      setLongPressId(id);
-    }, 500); // 500ms untuk long press
-    setPressTimer(timer);
-  };
-
-  const handlePressEnd = () => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
   };
 
   if (!isOpen) return null;
@@ -132,15 +115,8 @@ export const HistorySidebar = ({
               conversations.map((conv) => (
                 <Card
                   key={conv.id}
-                  className={`p-3 cursor-pointer hover:bg-accent transition-colors relative ${
-                    longPressId === conv.id ? "bg-destructive/10" : ""
-                  }`}
+                  className="p-3 cursor-pointer hover:bg-accent transition-colors relative"
                   onClick={() => onSelectConversation(conv.id)}
-                  onMouseDown={() => handlePressStart(conv.id)}
-                  onMouseUp={handlePressEnd}
-                  onMouseLeave={handlePressEnd}
-                  onTouchStart={() => handlePressStart(conv.id)}
-                  onTouchEnd={handlePressEnd}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
@@ -153,16 +129,14 @@ export const HistorySidebar = ({
                         })}
                       </p>
                     </div>
-                    {longPressId === conv.id && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                        onClick={(e) => handleDeleteConversation(conv.id, e)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={(e) => handleDeleteConversation(conv.id, e)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </Card>
               ))
