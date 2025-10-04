@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { HistorySidebar } from "./HistorySidebar";
 import { Session } from "@supabase/supabase-js";
+import ilmichatLogo from "@/assets/ilmichat-logo.png";
 
 type Message = {
   id: string;
@@ -261,15 +262,20 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
         <div className="flex-1 overflow-y-auto px-4 py-6">
           <div className="container mx-auto max-w-4xl space-y-4">
             {messages.length === 0 && (
-              <div className="flex items-center justify-center h-full">
-                <Card className="p-8 text-center max-w-md shadow-lg">
-                  <h2 className="text-2xl font-semibold mb-2 text-foreground">
-                    Assalamu'alaikum
+              <div className="flex items-center justify-center h-full min-h-[60vh]">
+                <div className="text-center space-y-6 max-w-md px-4">
+                  <img 
+                    src={ilmichatLogo} 
+                    alt="IlmiChat Logo" 
+                    className="w-32 h-32 mx-auto mb-6"
+                  />
+                  <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+                    Assalamu'alaikum!
                   </h2>
-                  <p className="text-muted-foreground">
-                    Mulai percakapan dalam mode {mode === "chat" ? "Chat" : "Dakwah"}
+                  <p className="text-muted-foreground text-lg">
+                    Saya ILMICHAT, siap menjawab pertanyaan Anda berdasarkan Al-Qur'an dan Hadits.
                   </p>
-                </Card>
+                </div>
               </div>
             )}
 
