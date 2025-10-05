@@ -65,10 +65,9 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
   const createNewConversation = async (firstUserMessage: string) => {
     if (!session?.user) return null;
 
-    // Generate a meaningful title from the first message
-    const title = firstUserMessage.length > 60 
-      ? firstUserMessage.substring(0, 60).trim() + "..." 
-      : firstUserMessage;
+    // Generate a short title from the first message (first 3-5 words)
+    const words = firstUserMessage.trim().split(/\s+/);
+    const title = words.slice(0, 5).join(" ");;
 
     const { data, error } = await supabase
       .from("conversations")
