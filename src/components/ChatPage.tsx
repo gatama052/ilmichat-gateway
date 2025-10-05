@@ -310,7 +310,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                 <Card className="p-4 bg-card border-primary/20 shadow-soft">
                   <div className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                    <span className="text-muted-foreground">Mengetik...</span>
+                    <span className="text-muted-foreground">Berpikir...</span>
                   </div>
                 </Card>
               </div>

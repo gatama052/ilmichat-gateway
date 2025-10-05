@@ -142,7 +142,7 @@ export const HistorySidebar = ({
               conversations.map((conv) => (
                 <Card
                   key={conv.id}
-                  className="p-3 cursor-pointer hover:bg-accent transition-colors relative"
+                  className="p-3 cursor-pointer hover:bg-accent transition-colors relative mr-2"
                   onClick={() => {
                     if (longPressId !== conv.id) {
                       onSelectConversation(conv.id);
@@ -169,7 +169,7 @@ export const HistorySidebar = ({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 animate-in fade-in zoom-in duration-200"
+                        className="h-8 w-8 flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10 animate-in fade-in zoom-in duration-200"
                         onClick={(e) => handleDeleteConversation(conv.id, e)}
                       >
                         <Trash2 className="h-4 w-4" />
