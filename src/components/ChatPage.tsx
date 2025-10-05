@@ -246,7 +246,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                   <Menu className="h-5 w-5" />
                 </Button>
                 <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent truncate">
-                  IlmiChat
+                  IlmiChat 052
                 </h1>
               </div>
               <Button
@@ -275,7 +275,9 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                     Assalamu'alaikum!
                   </h2>
                   <p className="text-muted-foreground text-base sm:text-lg px-4">
-                    Saya ILMICHAT, siap menjawab pertanyaan Anda berdasarkan Al-Qur'an dan Hadits.
+                    {mode === "chat" 
+                      ? "Saya ILMICHAT, siap menjawab pertanyaan Anda berdasarkan Al-Qur'an dan Hadits."
+                      : "Saya ILMICHAT, siap membantu anda untuk membuat teks kultum atau ceramah singkat."}
                   </p>
                 </div>
               </div>
