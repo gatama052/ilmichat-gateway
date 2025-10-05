@@ -142,7 +142,7 @@ export const HistorySidebar = ({
               conversations.map((conv) => (
                 <Card
                   key={conv.id}
-                  className="p-3 cursor-pointer hover:bg-accent transition-colors relative mr-2"
+                  className="p-3 cursor-pointer hover:bg-accent transition-colors relative mr-3"
                   onClick={() => {
                     if (longPressId !== conv.id) {
                       onSelectConversation(conv.id);
@@ -154,10 +154,10 @@ export const HistorySidebar = ({
                   onTouchStart={() => handleLongPressStart(conv.id)}
                   onTouchEnd={handleLongPressEnd}
                 >
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{conv.title}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="font-medium text-sm truncate pr-1">{conv.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         {new Date(conv.created_at).toLocaleDateString("id-ID", {
                           day: "numeric",
                           month: "short",
