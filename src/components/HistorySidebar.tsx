@@ -142,7 +142,7 @@ export const HistorySidebar = ({
               conversations.map((conv) => (
                 <Card
                   key={conv.id}
-                  className="px-3.5 py-2.5 cursor-pointer hover:bg-accent hover:shadow-md transition-all duration-200 relative mr-3 rounded-xl shadow-sm"
+                  className="px-3.5 py-2.5 cursor-pointer hover:bg-accent hover:shadow-md transition-all duration-200 rounded-xl shadow-sm"
                   onClick={() => {
                     if (longPressId !== conv.id) {
                       onSelectConversation(conv.id);
