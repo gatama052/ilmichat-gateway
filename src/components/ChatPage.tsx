@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Send, Loader2, Menu } from "lucide-react";
+import { Send, Loader2, Menu, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { HistorySidebar } from "./HistorySidebar";
@@ -31,6 +31,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -218,6 +219,18 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
     setShowHistory(false);
   };
 
+  const copyToClipboard = async (text: string, messageId: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(messageId);
+      toast.success("Teks berhasil disalin");
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (error) {
+      console.error("Error copying to clipboard:", error);
+      toast.error("Gagal menyalin teks");
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-background via-accent/20 to-background overflow-hidden">
       <HistorySidebar
@@ -286,21 +299,35 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                 key={message.id}
                 className={`flex ${message.isBot ? "justify-start" : "justify-end"} animate-in fade-in slide-in-from-bottom-4 duration-500`}
               >
-                <Card
-                  className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 ${
-                    message.isBot
-                      ? "bg-card border-primary/20 shadow-soft"
-                      : "bg-primary text-primary-foreground shadow-soft"
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{message.text}</p>
-                  <span className={`text-xs mt-2 block ${message.isBot ? "text-muted-foreground" : "text-primary-foreground/70"}`}>
-                    {message.timestamp.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </Card>
+                <div className={`flex items-start gap-2 max-w-[85%] sm:max-w-[80%] ${message.isBot ? "flex-row" : "flex-row-reverse"}`}>
+                  <Card
+                    className={`flex-1 p-3 sm:p-4 ${
+                      message.isBot
+                        ? "bg-card border-primary/20 shadow-soft"
+                        : "bg-primary text-primary-foreground shadow-soft"
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{message.text}</p>
+                    <span className={`text-xs mt-2 block ${message.isBot ? "text-muted-foreground" : "text-primary-foreground/70"}`}>
+                      {message.timestamp.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </Card>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+                    onClick={() => copyToClipboard(message.text, message.id)}
+                  >
+                    {copiedId === message.id ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
             ))}
 
