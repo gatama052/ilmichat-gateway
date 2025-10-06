@@ -12,6 +12,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("login");
 
   useEffect(() => {
     // Check if user is already logged in
@@ -83,12 +84,21 @@ const Auth = () => {
       <Card className="w-full max-w-md p-8 shadow-lg">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-2">
-            IlmiChat
+            IlmiChat 052
           </h1>
-          <p className="text-muted-foreground">Asisten AI Islami Anda</p>
+          <p className="text-muted-foreground mb-3">Asisten AI Islami Anda</p>
+          <p 
+            key={activeTab}
+            className="text-sm text-muted-foreground animate-fade-in"
+          >
+            {activeTab === "login" 
+              ? "Silakan masuk untuk melanjutkan ke IlmiChat 052 dan temui asisten AI Islami Anda."
+              : "Silakan mendaftar akun baru. Demi keamanan dan privasi, silakan buat akun khusus IlmiChat 052. Jangan gunakan akun Google atau email pribadi untuk masuk."
+            }
+          </p>
         </div>
 
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs defaultValue="login" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Daftar</TabsTrigger>
