@@ -299,35 +299,37 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                 key={message.id}
                 className={`flex ${message.isBot ? "justify-start" : "justify-end"} animate-in fade-in slide-in-from-bottom-4 duration-500`}
               >
-                <div className={`flex items-start gap-2 max-w-[85%] sm:max-w-[80%] ${message.isBot ? "flex-row" : "flex-row-reverse"}`}>
-                  <Card
-                    className={`flex-1 p-3 sm:p-4 ${
-                      message.isBot
-                        ? "bg-card border-primary/20 shadow-soft"
-                        : "bg-primary text-primary-foreground shadow-soft"
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{message.text}</p>
-                    <span className={`text-xs mt-2 block ${message.isBot ? "text-muted-foreground" : "text-primary-foreground/70"}`}>
+                <Card
+                  className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 ${
+                    message.isBot
+                      ? "bg-card border-primary/20 shadow-soft"
+                      : "bg-primary text-primary-foreground shadow-soft"
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{message.text}</p>
+                  <div className="flex items-center justify-between mt-2 gap-2">
+                    <span className={`text-xs ${message.isBot ? "text-muted-foreground" : "text-primary-foreground/70"}`}>
                       {message.timestamp.toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
                     </span>
-                  </Card>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
-                    onClick={() => copyToClipboard(message.text, message.id)}
-                  >
-                    {copiedId === message.id ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
+                    {message.isBot && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+                        onClick={() => copyToClipboard(message.text, message.id)}
+                      >
+                        {copiedId === message.id ? (
+                          <Check className="h-3 w-3 text-green-500" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </Button>
                     )}
-                  </Button>
-                </div>
+                  </div>
+                </Card>
               </div>
             ))}
 
