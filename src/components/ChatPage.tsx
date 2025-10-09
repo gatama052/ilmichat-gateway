@@ -280,7 +280,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                   <img 
                     src={ilmichatLogo} 
                     alt="IlmiChat Logo" 
-                    className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-4"
+                    className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-4 animate-friendly-blink"
                   />
                   <h2 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
                     Assalamu'alaikum!
