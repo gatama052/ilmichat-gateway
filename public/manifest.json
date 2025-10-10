@@ -1,0 +1,23 @@
+{
+  "name": "IlmiChat",
+  "short_name": "IlmiChat",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#9b5de5",
+  "description": "Sahabat digital Anda yang insya Allah akan membantu menjawab pertanyaan-pertanyaan Anda dengan sudut pandang Islam",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -6,6 +6,12 @@
     <title>IlmiChat</title>
     <meta name="description" content="Ilmichat sahabat digital Anda yang insya Allah akan membantu menjawab pertanyaan-pertanyaan Anda dengan sudut pandang Islam, merujuk pada Al-Qur'an, Hadits, perkataan ulama, dan kata mutiara Islami">
     <meta name="author" content="IlmiChat" />
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#9b5de5" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     
     
@@ -33,5 +39,21 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .then((registration) => {
+              console.log("✅ Service Worker terdaftar:", registration.scope);
+            })
+            .catch((error) => {
+              console.error("❌ Gagal daftar Service Worker:", error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
