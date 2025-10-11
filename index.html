@@ -3,9 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IlmiChat</title>
-    <meta name="description" content="Ilmichat sahabat digital Anda yang insya Allah akan membantu menjawab pertanyaan-pertanyaan Anda dengan sudut pandang Islam, merujuk pada Al-Qur'an, Hadits, perkataan ulama, dan kata mutiara Islami">
+    <title>IlmiChat 052</title>
+    <meta name="description" content="Asisten AI Islami dan Edukatif — IlmiChat 052">
     <meta name="author" content="IlmiChat" />
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
 
     
     
@@ -33,5 +38,21 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Register Service Worker -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .then((registration) => {
+              console.log("✅ Service Worker terdaftar!", registration.scope);
+            })
+            .catch((error) => {
+              console.error("❌ Gagal daftar Service Worker:", error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
