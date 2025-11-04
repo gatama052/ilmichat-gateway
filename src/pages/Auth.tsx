@@ -94,7 +94,7 @@ const Auth = () => {
             className="text-sm text-muted-foreground animate-fade-in"
           >
             {activeTab === "login" 
-              ? "Silakan masuk untuk melanjutkan ke IlmiChat 052 dan temui asisten AI Islami Anda."
+              ? "Silakan masuk untuk melanjutkan ke IlmiChat 052 dan temui asisten AI Islami Anda. atau belum punya akun ???,klik daftar untuk membuat !"
               : "Silakan mendaftar akun baru. Demi keamanan dan privasi, silakan buat akun khusus IlmiChat 052. Jangan gunakan akun Google atau email pribadi untuk masuk."
             }
           </p>
