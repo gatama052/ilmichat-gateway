@@ -88,14 +88,14 @@ const Auth = () => {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-2">
             IlmiChat 052
           </h1>
-          <p className="text-muted-foreground mb-3">Asisten AI Islami Anda</p>
+          <p className="text-muted-foreground mb-3">AI Assistant & Tools</p>
           <p 
             key={activeTab}
             className="text-sm text-muted-foreground animate-fade-in"
           >
             {activeTab === "login" 
-              ? "Silakan masuk untuk melanjutkan ke IlmiChat 052 dan temui asisten AI Islami Anda. atau belum punya akun ???,klik daftar untuk membuat !"
-              : "Silakan mendaftar akun baru. Demi keamanan dan privasi, silakan buat akun khusus IlmiChat 052. Jangan gunakan akun Google atau email pribadi untuk masuk."
+              ? "Silakan masuk untuk melanjutkan ke IlmiChat 052 dan temui AI Assistant Anda. Belum punya akun? Klik Daftar untuk membuat!"
+              : "Silakan mendaftar akun baru. Buat akun khusus IlmiChat 052 untuk keamanan dan privasi Anda."
             }
           </p>
         </div>

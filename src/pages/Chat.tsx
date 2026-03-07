@@ -1,7 +1,7 @@
 import { ChatPage } from "@/components/ChatPage";
 
 const Chat = () => {
-  return <ChatPage mode="chat" />;
+  return <ChatPage mode="assistant" />;
 };
 
 export default Chat;
