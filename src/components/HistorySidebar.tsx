@@ -15,7 +15,7 @@ type Conversation = {
 };
 
 interface HistorySidebarProps {
-  mode: "chat" | "dakwah";
+  mode: "assistant" | "tools";
   isOpen: boolean;
   onClose: () => void;
   onSelectConversation: (id: string) => void;
@@ -36,51 +36,41 @@ export const HistorySidebar = ({
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const { theme, setTheme } = useTheme();
 
+  // Map new mode names to DB mode values
+  const dbMode = mode === "assistant" ? "chat" : "dakwah";
+
   useEffect(() => {
-    if (isOpen) {
-      loadConversations();
-    }
+    if (isOpen) loadConversations();
   }, [isOpen, mode]);
 
   const loadConversations = async () => {
     const { data, error } = await supabase
       .from("conversations")
       .select("*")
-      .eq("mode", mode)
+      .eq("mode", dbMode)
       .order("updated_at", { ascending: false });
 
     if (error) {
-      console.error("Error loading conversations:", error);
       toast.error("Gagal memuat riwayat");
       return;
     }
-
     setConversations(data || []);
   };
 
   const handleDeleteConversation = async (id: string, e?: React.MouseEvent | React.TouchEvent) => {
     e?.stopPropagation();
-    
-    const { error } = await supabase
-      .from("conversations")
-      .delete()
-      .eq("id", id);
-
+    const { error } = await supabase.from("conversations").delete().eq("id", id);
     if (error) {
-      console.error("Error deleting conversation:", error);
       toast.error("Gagal menghapus percakapan");
       return;
     }
-
     toast.success("Percakapan berhasil dihapus");
     setConversations(conversations.filter((c) => c.id !== id));
     setLongPressId(null);
   };
 
   const handleLongPressStart = (id: string) => {
-    longPressTimer.current = setTimeout(() => {
-      setLongPressId(id);
-    }, 500); // 500ms for long press
+    longPressTimer.current = setTimeout(() => setLongPressId(id), 500);
   };
 
   const handleLongPressEnd = () => {
@@ -90,24 +80,18 @@ export const HistorySidebar = ({
     }
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-        onClick={onClose}
-      />
-
-      {/* Sidebar */}
+      <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
       <div className="fixed lg:relative left-0 top-0 h-full w-80 bg-card border-r border-border z-50 flex flex-col">
         <div className="p-4 border-b border-border flex items-center justify-between">
-          <h2 className="font-semibold text-lg">Riwayat {mode === "chat" ? "Chat" : "Dakwah"}</h2>
+          <h2 className="font-semibold text-lg">
+            Riwayat {mode === "assistant" ? "Assistant" : "Tools"}
+          </h2>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -119,14 +103,7 @@ export const HistorySidebar = ({
         </div>
 
         <div className="p-4 border-b border-border">
-          <Button 
-            onClick={() => {
-              onNewChat();
-              onClose();
-            }}
-            className="w-full"
-            variant="default"
-          >
+          <Button onClick={() => { onNewChat(); onClose(); }} className="w-full" variant="default">
             <Plus className="h-4 w-4 mr-2" />
             Obrolan Baru
           </Button>
@@ -135,19 +112,13 @@ export const HistorySidebar = ({
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-2">
             {conversations.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">
-                Belum ada riwayat percakapan
-              </p>
+              <p className="text-muted-foreground text-center py-8">Belum ada riwayat percakapan</p>
             ) : (
               conversations.map((conv) => (
                 <Card
                   key={conv.id}
                   className="w-full px-3.5 py-2.5 cursor-pointer hover:bg-accent hover:shadow-md transition-all duration-200 rounded-xl shadow-sm"
-                  onClick={() => {
-                    if (longPressId !== conv.id) {
-                      onSelectConversation(conv.id);
-                    }
-                  }}
+                  onClick={() => { if (longPressId !== conv.id) onSelectConversation(conv.id); }}
                   onMouseDown={() => handleLongPressStart(conv.id)}
                   onMouseUp={handleLongPressEnd}
                   onMouseLeave={handleLongPressEnd}
@@ -156,15 +127,9 @@ export const HistorySidebar = ({
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex-1 min-w-0 overflow-hidden">
-                      <p className="font-medium text-sm truncate overflow-hidden text-ellipsis whitespace-nowrap">
-                        {conv.title}
-                      </p>
+                      <p className="font-medium text-sm truncate">{conv.title}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(conv.created_at).toLocaleDateString("id-ID", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                        {new Date(conv.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
                     </div>
                     {longPressId === conv.id && (
@@ -185,11 +150,7 @@ export const HistorySidebar = ({
         </ScrollArea>
 
         <div className="p-4 border-t border-border">
-          <Button 
-            onClick={onLogout}
-            className="w-full"
-            variant="ghost"
-          >
+          <Button onClick={onLogout} className="w-full" variant="ghost">
             <LogOut className="h-4 w-4 mr-2" />
             Keluar
           </Button>

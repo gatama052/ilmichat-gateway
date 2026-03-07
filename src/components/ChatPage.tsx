@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Send, Loader2, Menu, Copy, Check } from "lucide-react";
+import { Send, Loader2, Menu, Copy, Check, PenLine, Lightbulb, FileText, Languages, Code2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { HistorySidebar } from "./HistorySidebar";
@@ -17,7 +17,16 @@ type Message = {
   timestamp: Date;
 };
 
-type Mode = "chat" | "dakwah";
+type Mode = "assistant" | "tools";
+type ToolType = "writer" | "ideas" | "summarizer" | "translator" | "code";
+
+const TOOLS: { id: ToolType; label: string; icon: React.ReactNode; desc: string }[] = [
+  { id: "writer", label: "AI Writer", icon: <PenLine className="h-5 w-5" />, desc: "Buat artikel, caption, email, cerita" },
+  { id: "ideas", label: "Idea Generator", icon: <Lightbulb className="h-5 w-5" />, desc: "Hasilkan ide bisnis, konten, proyek" },
+  { id: "summarizer", label: "Summarizer", icon: <FileText className="h-5 w-5" />, desc: "Ringkas teks panjang jadi poin utama" },
+  { id: "translator", label: "Translator", icon: <Languages className="h-5 w-5" />, desc: "Terjemahkan teks antar bahasa" },
+  { id: "code", label: "Code Helper", icon: <Code2 className="h-5 w-5" />, desc: "Buat, perbaiki, jelaskan kode" },
+];
 
 interface ChatPageProps {
   mode: Mode;
@@ -32,6 +41,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [selectedTool, setSelectedTool] = useState<ToolType | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -43,21 +53,20 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
   }, [messages]);
 
   useEffect(() => {
-    // Check auth
+    setMessages([]);
+    setCurrentConversationId(null);
+    setSelectedTool(null);
+  }, [mode]);
+
+  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
-        setSession(session);
-      }
+      if (!session) navigate("/auth");
+      else setSession(session);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
-        setSession(session);
-      }
+      if (!session) navigate("/auth");
+      else setSession(session);
     });
 
     return () => subscription.unsubscribe();
@@ -65,17 +74,12 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
 
   const createNewConversation = async (firstUserMessage: string) => {
     if (!session?.user) return null;
-
-    // Generate a short title from the first message (max 35 characters)
     const title = firstUserMessage.trim().slice(0, 35);
+    const dbMode = mode === "assistant" ? "chat" : "dakwah";
 
     const { data, error } = await supabase
       .from("conversations")
-      .insert({
-        user_id: session.user.id,
-        mode,
-        title,
-      })
+      .insert({ user_id: session.user.id, mode: dbMode, title })
       .select()
       .single();
 
@@ -84,35 +88,20 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
       toast.error("Gagal membuat percakapan");
       return null;
     }
-
     return data.id;
   };
 
   const saveMessage = async (text: string, isBot: boolean, isFirstMessage: boolean = false) => {
     if (!session?.user) return;
-
     let conversationId = currentConversationId;
     
     if (!conversationId && isFirstMessage) {
       conversationId = await createNewConversation(text);
-      if (conversationId) {
-        setCurrentConversationId(conversationId);
-      } else {
-        return;
-      }
+      if (conversationId) setCurrentConversationId(conversationId);
+      else return;
     }
 
-    const { error } = await supabase
-      .from("messages")
-      .insert({
-        conversation_id: conversationId,
-        text,
-        is_bot: isBot,
-      });
-
-    if (error) {
-      console.error("Error saving message:", error);
-    }
+    await supabase.from("messages").insert({ conversation_id: conversationId, text, is_bot: isBot });
   };
 
   const sendMessage = async () => {
@@ -130,7 +119,6 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
     setInputValue("");
     setIsLoading(true);
 
-    // Save user message (mark as first if no conversation exists)
     const isFirstMessage = currentConversationId === null;
     await saveMessage(userText, false, isFirstMessage);
 
@@ -145,7 +133,8 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
           },
           body: JSON.stringify({
             userMessage: userText,
-            mode: mode,
+            mode,
+            tool: mode === "tools" ? selectedTool : undefined,
           }),
         }
       );
@@ -156,7 +145,6 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
       }
 
       const data = await resp.json();
-
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: data.text,
@@ -165,8 +153,6 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
       };
 
       setMessages((prev) => [...prev, botMessage]);
-      
-      // Save bot message
       await saveMessage(data.text, true);
     } catch (error) {
       console.error("Error sending message:", error);
@@ -192,6 +178,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
   const handleNewChat = () => {
     setMessages([]);
     setCurrentConversationId(null);
+    setSelectedTool(null);
   };
 
   const loadConversation = async (conversationId: string) => {
@@ -202,19 +189,16 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
       .order("created_at", { ascending: true });
 
     if (error) {
-      console.error("Error loading conversation:", error);
       toast.error("Gagal memuat percakapan");
       return;
     }
 
-    const loadedMessages: Message[] = data.map((msg) => ({
+    setMessages(data.map((msg) => ({
       id: msg.id,
       text: msg.text,
       isBot: msg.is_bot,
       timestamp: new Date(msg.created_at),
-    }));
-
-    setMessages(loadedMessages);
+    })));
     setCurrentConversationId(conversationId);
     setShowHistory(false);
   };
@@ -225,10 +209,17 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
       setCopiedId(messageId);
       toast.success("Teks berhasil disalin");
       setTimeout(() => setCopiedId(null), 2000);
-    } catch (error) {
-      console.error("Error copying to clipboard:", error);
+    } catch {
       toast.error("Gagal menyalin teks");
     }
+  };
+
+  const getPlaceholder = () => {
+    if (mode === "tools" && selectedTool) {
+      const t = TOOLS.find(t => t.id === selectedTool);
+      return t ? `Gunakan ${t.label}...` : "Ketik pesan Anda...";
+    }
+    return "Ketik pesan Anda...";
   };
 
   return (
@@ -248,12 +239,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
           <div className="w-full px-3 sm:px-4 py-3">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowHistory(!showHistory)}
-                  className="flex-shrink-0"
-                >
+                <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)} className="flex-shrink-0">
                   <Menu className="h-5 w-5" />
                 </Button>
                 <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent truncate">
@@ -261,11 +247,11 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                 </h1>
               </div>
               <Button
-                variant={mode === "chat" ? "ghost" : "default"}
-                onClick={() => navigate(mode === "chat" ? "/dakwah" : "/chat")}
+                variant={mode === "assistant" ? "ghost" : "default"}
+                onClick={() => navigate(mode === "assistant" ? "/tools" : "/chat")}
                 className="flex-shrink-0 text-sm sm:text-base"
               >
-                {mode === "chat" ? "Dakwah" : "Chat"}
+                {mode === "assistant" ? "AI Tools" : "AI Assistant"}
               </Button>
             </div>
           </div>
@@ -277,55 +263,60 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
             {messages.length === 0 && (
               <div className="flex items-center justify-center h-full min-h-[60vh] px-4">
                 <div className="text-center space-y-4 w-full max-w-md">
-                  <img 
-                    src={ilmichatLogo} 
-                    alt="IlmiChat Logo" 
-                    className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-4 animate-friendly-blink"
-                  />
+                  <img src={ilmichatLogo} alt="IlmiChat Logo" className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-4 animate-friendly-blink" />
                   <h2 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-                    Assalamu'alaikum!
+                    {mode === "assistant" ? "Halo! 👋" : "AI Tools"}
                   </h2>
                   <p className="text-muted-foreground text-base sm:text-lg px-4">
-                    {mode === "chat" 
-                      ? "Saya ILMICHAT, siap menjawab pertanyaan Anda berdasarkan Al-Qur'an dan Hadits."
-                      : "Saya ILMICHAT, siap membantu anda untuk membuat teks kultum atau ceramah singkat."}
+                    {mode === "assistant"
+                      ? "Saya AI Assistant Anda. Tanya apa saja — sains, teknologi, bisnis, coding, atau sekadar ngobrol!"
+                      : "Pilih tool AI di bawah untuk memulai tugas spesifik."}
                   </p>
+
+                  {mode === "tools" && !selectedTool && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 text-left">
+                      {TOOLS.map((tool) => (
+                        <Card
+                          key={tool.id}
+                          className="p-4 cursor-pointer hover:bg-accent/60 hover:shadow-md transition-all duration-200 border-primary/20"
+                          onClick={() => setSelectedTool(tool.id)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="text-primary">{tool.icon}</div>
+                            <div>
+                              <p className="font-semibold text-sm">{tool.label}</p>
+                              <p className="text-xs text-muted-foreground">{tool.desc}</p>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+
+                  {mode === "tools" && selectedTool && (
+                    <div className="mt-4">
+                      <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium">
+                        {TOOLS.find(t => t.id === selectedTool)?.icon}
+                        {TOOLS.find(t => t.id === selectedTool)?.label}
+                        <button onClick={() => setSelectedTool(null)} className="ml-1 hover:text-destructive transition-colors">✕</button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.isBot ? "justify-start" : "justify-end"} animate-in fade-in slide-in-from-bottom-4 duration-500`}
-              >
-                <Card
-                  className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 ${
-                    message.isBot
-                      ? "bg-card border-primary/20 shadow-soft"
-                      : "bg-primary text-primary-foreground shadow-soft"
-                  }`}
-                >
+              <div key={message.id} className={`flex ${message.isBot ? "justify-start" : "justify-end"} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
+                <Card className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 ${message.isBot ? "bg-card border-primary/20 shadow-soft" : "bg-primary text-primary-foreground shadow-soft"}`}>
                   <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{message.text}</p>
                   <div className="flex items-center justify-between mt-2 gap-2">
                     <span className={`text-xs ${message.isBot ? "text-muted-foreground" : "text-primary-foreground/70"}`}>
-                      {message.timestamp.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </span>
                     {message.isBot && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
-                        onClick={() => copyToClipboard(message.text, message.id)}
-                      >
-                        {copiedId === message.id ? (
-                          <Check className="h-3 w-3 text-green-500" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
+                      <Button variant="ghost" size="icon" className="h-6 w-6 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity" onClick={() => copyToClipboard(message.text, message.id)}>
+                        {copiedId === message.id ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
                       </Button>
                     )}
                   </div>
@@ -348,31 +339,45 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
           </div>
         </div>
 
+        {/* Tool selector bar when in tools mode with messages */}
+        {mode === "tools" && messages.length > 0 && selectedTool && (
+          <div className="border-t border-border bg-card/60 px-3 py-2">
+            <div className="max-w-4xl mx-auto flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Tool aktif:</span>
+              <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                {TOOLS.find(t => t.id === selectedTool)?.icon}
+                {TOOLS.find(t => t.id === selectedTool)?.label}
+                <button onClick={() => setSelectedTool(null)} className="ml-1 hover:text-destructive">✕</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Input Area */}
         <div className="border-t border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
           <div className="w-full px-3 sm:px-4 py-3 sm:py-4 max-w-4xl mx-auto">
-            <div className="flex gap-2">
-              <Textarea
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ketik pesan Anda..."
-                className="min-h-[60px] resize-none focus-visible:ring-primary flex-1"
-                disabled={isLoading}
-              />
-              <Button
-                onClick={sendMessage}
-                disabled={!inputValue.trim() || isLoading}
-                size="icon"
-                className="h-[60px] w-[60px] rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Send className="h-5 w-5" />
-                )}
-              </Button>
-            </div>
+            {mode === "tools" && !selectedTool && messages.length === 0 ? (
+              <p className="text-center text-sm text-muted-foreground py-2">Pilih tool di atas untuk memulai</p>
+            ) : (
+              <div className="flex gap-2">
+                <Textarea
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={getPlaceholder()}
+                  className="min-h-[60px] resize-none focus-visible:ring-primary flex-1"
+                  disabled={isLoading || (mode === "tools" && !selectedTool)}
+                />
+                <Button
+                  onClick={sendMessage}
+                  disabled={!inputValue.trim() || isLoading || (mode === "tools" && !selectedTool)}
+                  size="icon"
+                  className="h-[60px] w-[60px] rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0"
+                >
+                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

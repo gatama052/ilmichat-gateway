@@ -4,10 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
-import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
-import Dakwah from "./pages/Dakwah";
+import Tools from "./pages/Dakwah";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +23,7 @@ function App() {
               <Route path="/" element={<Navigate to="/chat" replace />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/chat" element={<Chat />} />
-              <Route path="/dakwah" element={<Dakwah />} />
+              <Route path="/tools" element={<Tools />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

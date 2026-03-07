@@ -1,7 +1,7 @@
 import { ChatPage } from "@/components/ChatPage";
 
-const Dakwah = () => {
-  return <ChatPage mode="dakwah" />;
+const Tools = () => {
+  return <ChatPage mode="tools" />;
 };
 
-export default Dakwah;
+export default Tools;
