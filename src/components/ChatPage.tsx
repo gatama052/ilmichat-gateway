@@ -249,7 +249,7 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
               <Button
                 variant="default"
                 onClick={() => navigate(mode === "assistant" ? "/tools" : "/chat")}
-                className="flex-shrink-0 text-sm sm:text-base bg-gradient-to-r from-primary to-secondary text-white shadow-md hover:shadow-lg hover:opacity-90 transition-all duration-300"
+                className="flex-shrink-0 text-sm sm:text-base bg-foreground text-background hover:bg-foreground/85 shadow-md hover:shadow-lg transition-all duration-300 font-semibold"
               >
                 {mode === "assistant" ? "🛠 AI Tools" : "💬 AI Assistant"}
               </Button>
