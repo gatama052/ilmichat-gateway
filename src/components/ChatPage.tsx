@@ -274,21 +274,24 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                   </p>
 
                   {mode === "tools" && !selectedTool && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 text-left">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left">
                       {TOOLS.map((tool) => (
-                        <Card
+                        <button
                           key={tool.id}
-                          className="p-4 cursor-pointer hover:bg-accent/60 hover:shadow-md transition-all duration-200 border-primary/20"
+                          className="group p-5 bg-gradient-to-br from-primary/10 via-accent/30 to-secondary/10 rounded-xl border-2 border-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 flex items-center gap-4 text-left"
                           onClick={() => setSelectedTool(tool.id)}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="text-primary">{tool.icon}</div>
-                            <div>
-                              <p className="font-semibold text-sm">{tool.label}</p>
-                              <p className="text-xs text-muted-foreground">{tool.desc}</p>
-                            </div>
+                          <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                            {tool.icon}
                           </div>
-                        </Card>
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">{tool.label}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{tool.desc}</p>
+                          </div>
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 group-hover:bg-primary group-hover:text-white text-primary flex items-center justify-center transition-all duration-300">
+                            <span className="text-xs">→</span>
+                          </div>
+                        </button>
                       ))}
                     </div>
                   )}
