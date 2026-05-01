@@ -21,23 +21,24 @@ serve(async (req) => {
       );
     }
 
+    // Gunakan signed URL untuk koneksi WebSocket (lebih kompatibel daripada WebRTC di iframe)
     const resp = await fetch(
-      `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${ELEVENLABS_AGENT_ID}`,
+      `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${ELEVENLABS_AGENT_ID}`,
       { headers: { "xi-api-key": ELEVENLABS_API_KEY } }
     );
 
     if (!resp.ok) {
       const errText = await resp.text();
-      console.error("ElevenLabs token error:", resp.status, errText);
+      console.error("ElevenLabs signed-url error:", resp.status, errText);
       return new Response(
-        JSON.stringify({ error: `Gagal mengambil token: ${resp.status}` }),
+        JSON.stringify({ error: `Gagal mengambil signed URL: ${resp.status}` }),
         { status: resp.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const data = await resp.json();
     return new Response(
-      JSON.stringify({ token: data.token, agentId: ELEVENLABS_AGENT_ID }),
+      JSON.stringify({ signedUrl: data.signed_url, agentId: ELEVENLABS_AGENT_ID }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
