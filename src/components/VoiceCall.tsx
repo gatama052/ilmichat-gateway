@@ -29,11 +29,11 @@ export const VoiceCall = ({ onClose }: VoiceCallProps) => {
 
       const { data, error } = await supabase.functions.invoke("elevenlabs-token");
       if (error) throw error;
-      if (!data?.token) throw new Error("Token tidak diterima");
+      if (!data?.signedUrl) throw new Error("Signed URL tidak diterima");
 
       await conversation.startSession({
-        conversationToken: data.token,
-        connectionType: "webrtc",
+        signedUrl: data.signedUrl,
+        connectionType: "websocket",
       });
     } catch (err: any) {
       console.error("Start call failed:", err);
