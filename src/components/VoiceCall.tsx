@@ -51,7 +51,7 @@ export const VoiceCall = ({ onClose }: VoiceCallProps) => {
   const toggleMute = useCallback(async () => {
     const next = !muted;
     setMuted(next);
-    await conversation.setVolume({ volume: next ? 0 : 1 });
+    conversation.setMuted(next);
   }, [muted, conversation]);
 
   // Auto start when mounted
