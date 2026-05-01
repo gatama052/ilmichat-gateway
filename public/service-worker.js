@@ -1,54 +1,21 @@
-const CACHE_NAME = "ilmichat-cache-v1";
-const urlsToCache = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/icon-192.png",
-  "/icon-512.png"
-];
+const clearAllCaches = async () => {
+  const cacheNames = await caches.keys();
+  await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+};
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("Service Worker: Caching files");
-      return cache.addAll(urlsToCache);
-    })
-  );
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log("Service Worker: Clearing old cache");
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
-});
+    (async () => {
+      await clearAllCaches();
+      await self.clients.claim();
+      await self.registration.unregister();
 
-self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        return response;
-      }
-      return fetch(event.request).then((response) => {
-        if (!response || response.status !== 200 || response.type !== "basic") {
-          return response;
-        }
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-        return response;
-      });
-    })
+      const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      clients.forEach((client) => client.navigate(client.url));
+    })()
   );
 });
