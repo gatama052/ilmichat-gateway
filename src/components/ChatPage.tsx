@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Send, Loader2, Menu, Copy, Check, PenLine, Lightbulb, FileText, Languages, Code2, Paperclip, X, ImageIcon } from "lucide-react";
+import { Send, Loader2, Menu, Copy, Check, PenLine, Lightbulb, FileText, Languages, Code2, Paperclip, X, ImageIcon, Mic } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { HistorySidebar } from "./HistorySidebar";
@@ -513,6 +513,18 @@ export const ChatPage = ({ mode }: ChatPageProps) => {
                     aria-label="Lampirkan file atau gambar"
                   >
                     <Paperclip className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => navigate("/voice")}
+                    disabled={isLoading}
+                    className="h-[60px] w-[48px] flex-shrink-0"
+                    aria-label="Mulai voice chat"
+                    title="Ngobrol pakai suara"
+                  >
+                    <Mic className="h-5 w-5" />
                   </Button>
                   <Textarea
                     value={inputValue}

@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import Tools from "./pages/Dakwah";
+import Voice from "./pages/Voice";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ function App() {
               <Route path="/auth" element={<Auth />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/tools" element={<Tools />} />
+              <Route path="/voice" element={<Voice />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
