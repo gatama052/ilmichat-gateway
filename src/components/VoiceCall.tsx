@@ -58,7 +58,7 @@ export const VoiceCall = ({ onClose }: VoiceCallProps) => {
   useEffect(() => {
     startCall();
     return () => {
-      conversation.endSession().catch(() => {});
+      try { conversation.endSession(); } catch {}
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
