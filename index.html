@@ -38,21 +38,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Register Service Worker -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/service-worker.js")
-            .then((registration) => {
-              console.log("✅ Service Worker terdaftar!", registration.scope);
-            })
-            .catch((error) => {
-              console.error("❌ Gagal daftar Service Worker:", error);
-            });
-        });
-      }
-    </script>
   </body>
 </html>
